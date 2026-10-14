@@ -89,6 +89,11 @@ claude mcp add pyplai -- uvx --from git+https://github.com/plss12/pyplAI-MCP pyp
 Then ask for a game, for example: *"Play Phantom against the MO-ISMCTS opponent, and analyse each
 position before you move."*
 
+[Here is a real game](examples/phantom-claude-desktop.md) that Claude played and won from Claude
+Desktop, analysing every position before moving:
+
+![Claude Desktop calling play_move and analyze_position in a game of Phantom](examples/phantom-claude-desktop.png)
+
 ## Design notes
 
 - **The search never touches the real game.** Every analysis runs on a copy of the state, and in
