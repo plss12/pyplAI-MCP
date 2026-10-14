@@ -59,12 +59,13 @@ output with a published schema.
 
 ## Use it
 
-Requires [uv](https://docs.astral.sh/uv/). The server speaks MCP over stdio.
+Requires [uv](https://docs.astral.sh/uv/). The server speaks MCP over stdio, and `uvx` installs and
+runs it straight from this repository (it is not on PyPI yet).
 
 **Claude Code**
 
 ```bash
-claude mcp add pyplai -- uvx pyplai-mcp
+claude mcp add pyplai -- uvx --from git+https://github.com/plss12/pyplAI-MCP pyplai-mcp
 ```
 
 **Claude Desktop** (`claude_desktop_config.json`)
@@ -74,14 +75,14 @@ claude mcp add pyplai -- uvx pyplai-mcp
   "mcpServers": {
     "pyplai": {
       "command": "uvx",
-      "args": ["pyplai-mcp"]
+      "args": ["--from", "git+https://github.com/plss12/pyplAI-MCP", "pyplai-mcp"]
     }
   }
 }
 ```
 
-**Any other client:** run `uvx pyplai-mcp` over stdio, or
-`uvx pyplai-mcp --transport streamable-http --port 8000` and connect to `http://127.0.0.1:8000/mcp`.
+**Any other client:** run `uvx --from git+https://github.com/plss12/pyplAI-MCP pyplai-mcp` over stdio, or add
+`--transport streamable-http --port 8000` and connect to `http://127.0.0.1:8000/mcp`.
 
 Then ask for a game, for example: *"Play Phantom against the MO-ISMCTS opponent, and analyse each
 position before you move."*
@@ -118,6 +119,8 @@ npx @modelcontextprotocol/inspector uv run pyplai-mcp
 ```
 
 ## Roadmap
+
+- Publish on PyPI, so it installs with `uvx pyplai-mcp`, and list it in the official MCP Registry.
 
 - Benchmark small open models served locally with Ollama, with and without the search tools, to
   measure how much search improves their play.

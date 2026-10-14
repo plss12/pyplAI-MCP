@@ -576,14 +576,7 @@ crypto = [
 [[package]]
 name = "pyplai"
 version = "1.1.0"
-source = { directory = "../pyplAI" }
-
-[package.metadata]
-requires-dist = [
-    { name = "colorama", marker = "extra == 'dev'", specifier = ">=0.4" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7" },
-]
-provides-extras = ["dev"]
+source = { git = "https://github.com/plss12/pyplAI?rev=v1.1.0#c667a17916e338d01c1004e28c1e043ab4600c37" }
 
 [[package]]
 name = "pyplai-mcp"
@@ -605,7 +598,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "mcp", specifier = ">=2.3,<3" },
-    { name = "pyplai", directory = "../pyplAI" },
+    { name = "pyplai", git = "https://github.com/plss12/pyplAI?rev=v1.1.0" },
 ]
 
 [package.metadata.requires-dev]
