@@ -166,8 +166,10 @@ def new_game(
         except ValueError:
             legal = ", ".join(state.move_id(m) for m in state.legal_moves())
             raise ToolError(f"Opening move {number} ({text!r}) is not legal there. Legal moves: {legal}.") from None
-        events.append(f"Opening: {_player_label(state, state.jugadorActual)} played {text}.")
+        player = state.jugadorActual
         state.apply(move)
+        verb = "tried" if isinstance(state, Phantom) and state.jugadorActual == player and state.winner() is None else "played"
+        events.append(f"Opening: {_player_label(state, player)} {verb} {text}.")
     session = store.add(state, play_as, name, engine)
     with session.lock:
         session.events.extend(events)

@@ -129,3 +129,10 @@ async def test_phantom_never_reveals_hidden_stones(client):
         pytest.fail("the game did not end")
     if state["status"] != "your_turn":
         assert any("full board" in note for note in state["notes"])
+
+
+@pytest.mark.anyio
+async def test_phantom_opening_reports_bumps_as_attempts(client):
+    state = await call(client, "new_game", game="phantom", opening=["b2", "c2", "c2", "c3"], opponent="random")
+    assert state["history"][2] == "Opening: player 1 tried c2."
+    assert state["board"].splitlines()[2] == "2 . Y o ."
