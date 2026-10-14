@@ -20,6 +20,7 @@ LLM_TOOLS = {"llm": ["play_move"], "llm+search": ["analyze_position", "play_move
 CONDITIONS = ["llm", "llm+search", "search", "random"]
 # Attempts the model gets per turn before the harness plays a random legal move for it
 MAX_STEPS_PER_TURN = 6
+OLLAMA_ATTEMPTS = 5
 
 
 @dataclass
@@ -49,7 +50,16 @@ def ollama_chat(model: str, messages: list[dict[str, Any]], tools: list[dict[str
     """One chat turn with a local Ollama model, deterministic and without long reasoning."""
     import ollama
 
-    response = ollama.chat(model=model, messages=messages, tools=tools, think=False, options={"temperature": 0, "seed": 0})
+    # Ollama on Windows sometimes fails to reach its own model runner for a moment. With temperature 0
+    # a retry gives the same reply, so retrying does not change the results.
+    for attempt in range(1, OLLAMA_ATTEMPTS + 1):
+        try:
+            response = ollama.chat(model=model, messages=messages, tools=tools, think=False, options={"temperature": 0, "seed": 0})
+            break
+        except (ollama.ResponseError, ConnectionError):
+            if attempt == OLLAMA_ATTEMPTS:
+                raise
+            time.sleep(5 * attempt)
     calls = [(c.function.name, dict(c.function.arguments)) for c in (response.message.tool_calls or [])]
     return {
         "content": response.message.content or "",
