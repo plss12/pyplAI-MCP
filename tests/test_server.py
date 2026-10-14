@@ -66,7 +66,8 @@ async def test_opponent_moves_first_when_you_play_second(client):
 async def test_illegal_move_lists_the_legal_ones(client):
     state = await call(client, "new_game", game="tictactoe", opening=["b2"], opponent="random")
     message = await call_error(client, "play_move", game_id=state["game_id"], move="b2")
-    assert "not a legal move" in message and "a1" in message
+    assert "not a legal move" in message
+    assert message.endswith("Legal moves: " + ", ".join(state["legal_moves"]) + ".")
 
 
 @pytest.mark.anyio
