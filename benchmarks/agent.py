@@ -21,6 +21,9 @@ CONDITIONS = ["llm", "llm+search", "search", "random"]
 # Attempts the model gets per turn before the harness plays a random legal move for it
 MAX_STEPS_PER_TURN = 6
 OLLAMA_ATTEMPTS = 5
+# Deterministic replies, capped in length: a tool call takes under 100 tokens, but a small model
+# sometimes falls into a loop of text that runs for minutes. A cut reply counts as one failed attempt.
+OLLAMA_OPTIONS = {"temperature": 0, "seed": 0, "num_predict": 512}
 
 
 @dataclass
@@ -54,7 +57,7 @@ def ollama_chat(model: str, messages: list[dict[str, Any]], tools: list[dict[str
     # a retry gives the same reply, so retrying does not change the results.
     for attempt in range(1, OLLAMA_ATTEMPTS + 1):
         try:
-            response = ollama.chat(model=model, messages=messages, tools=tools, think=False, options={"temperature": 0, "seed": 0})
+            response = ollama.chat(model=model, messages=messages, tools=tools, think=False, options=OLLAMA_OPTIONS)
             break
         except (ollama.ResponseError, ConnectionError):
             if attempt == OLLAMA_ATTEMPTS:

@@ -31,7 +31,7 @@ def main() -> None:
             groups[(row["game"], row["condition"], row["model"])].append(row)
     print(
         "| Game | Player | Model | Games | Wins [95% CI] | Draws | Losses [95% CI] | Analysed | Follows "
-        "| Illegal moves / game | Fallback moves / game | Seconds / game |"
+        "| Illegal moves / game | Fallback moves / game | Median seconds / game |"
     )
     print("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for (game, condition, model), rows in groups.items():
@@ -47,7 +47,7 @@ def main() -> None:
         analysis = f"{100 * analysed / own_moves:.0f}% | {100 * followed / analysed:.0f}%" if analysed else "- | -"
         illegal = statistics.mean(int(r["illegal_moves"]) for r in rows)
         fallback = statistics.mean(int(r["fallback_moves"]) for r in rows)
-        seconds = statistics.mean(float(r["seconds"]) for r in rows)
+        seconds = statistics.median(float(r["seconds"]) for r in rows)
         print(
             f"| {game} | {condition} | {model} | {n} | {100 * wins / n:.0f}% [{100 * low:.0f}-{100 * high:.0f}] | "
             f"{100 * draws / n:.0f}% | {100 * losses / n:.0f}% [{100 * loss_low:.0f}-{100 * loss_high:.0f}] | "
