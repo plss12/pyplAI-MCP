@@ -107,8 +107,17 @@ async def call(client: Client, tool: str, **arguments: Any) -> tuple[bool, Any]:
 
 
 async def play_llm_turn(
-    client: Client, game_id: str, state: dict[str, Any], model: str, condition: str, tools: list[dict[str, Any]],
-    rules: str, chat: ChatFn, analysis_seconds: float, stats: Stats, rng: random.Random,
+    client: Client,
+    game_id: str,
+    state: dict[str, Any],
+    model: str,
+    condition: str,
+    tools: list[dict[str, Any]],
+    rules: str,
+    chat: ChatFn,
+    analysis_seconds: float,
+    stats: Stats,
+    rng: random.Random,
 ) -> dict[str, Any]:
     """Let the model choose and play one move. Returns the new state."""
     messages: list[dict[str, Any]] = [
@@ -123,7 +132,9 @@ async def play_llm_turn(
         stats.prompt_tokens += reply["prompt_tokens"]
         stats.output_tokens += reply["output_tokens"]
         calls = reply["tool_calls"]
-        messages.append({"role": "assistant", "content": reply["content"], "tool_calls": [{"function": {"name": n, "arguments": a}} for n, a in calls]})
+        messages.append(
+            {"role": "assistant", "content": reply["content"], "tool_calls": [{"function": {"name": n, "arguments": a}} for n, a in calls]}
+        )
         if not calls:
             stats.replies_without_tool += 1
             messages.append({"role": "user", "content": "Call play_move with one of your legal moves: " + ", ".join(state["legal_moves"])})
@@ -150,8 +161,18 @@ async def play_llm_turn(
 
 
 async def play_game(
-    client: Client, *, game: str, condition: str, model: str, seed: int, opponent: str, opponent_seconds: float,
-    analysis_seconds: float, chat: ChatFn = ollama_chat, mcp_tools: list[Any] | None = None, rules: str = "",
+    client: Client,
+    *,
+    game: str,
+    condition: str,
+    model: str,
+    seed: int,
+    opponent: str,
+    opponent_seconds: float,
+    analysis_seconds: float,
+    chat: ChatFn = ollama_chat,
+    mcp_tools: list[Any] | None = None,
+    rules: str = "",
 ) -> tuple[str, Stats]:
     """Play one full game. Returns ("win" | "draw" | "loss", stats)."""
     rng = random.Random(seed)

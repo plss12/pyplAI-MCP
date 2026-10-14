@@ -1,6 +1,6 @@
 """Summarise results.csv: win, draw and loss rates per game, condition and model, with 95% Wilson intervals.
 
-    uv run python benchmarks/summary.py [results.csv]
+uv run python benchmarks/summary.py [results.csv]
 """
 
 from __future__ import annotations
@@ -26,7 +26,9 @@ def main() -> None:
     with path.open(encoding="utf-8") as f:
         for row in csv.DictReader(f):
             groups[(row["game"], row["condition"], row["model"])].append(row)
-    print("| Game | Player | Model | Games | Wins [95% CI] | Draws | Losses | Illegal moves / game | Fallback moves / game | Seconds / game |")
+    print(
+        "| Game | Player | Model | Games | Wins [95% CI] | Draws | Losses | Illegal moves / game | Fallback moves / game | Seconds / game |"
+    )
     print("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for (game, condition, model), rows in groups.items():
         n = len(rows)
@@ -36,8 +38,10 @@ def main() -> None:
         illegal = statistics.mean(int(r["illegal_moves"]) for r in rows)
         fallback = statistics.mean(int(r["fallback_moves"]) for r in rows)
         seconds = statistics.mean(float(r["seconds"]) for r in rows)
-        print(f"| {game} | {condition} | {model} | {n} | {100 * wins / n:.0f}% [{100 * low:.0f}-{100 * high:.0f}] | "
-              f"{100 * draws / n:.0f}% | {100 * (n - wins - draws) / n:.0f}% | {illegal:.2f} | {fallback:.2f} | {seconds:.0f} |")
+        print(
+            f"| {game} | {condition} | {model} | {n} | {100 * wins / n:.0f}% [{100 * low:.0f}-{100 * high:.0f}] | "
+            f"{100 * draws / n:.0f}% | {100 * (n - wins - draws) / n:.0f}% | {illegal:.2f} | {fallback:.2f} | {seconds:.0f} |"
+        )
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ from mcp import Client
 from pyplai_mcp.server import mcp
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "benchmarks"))
-from agent import play_game, to_ollama_tools  # noqa: E402
+from agent import play_game, to_ollama_tools
 
 
 @pytest.fixture
@@ -33,7 +33,12 @@ def analyse_then_follow(model, messages, tools):
     if last["role"] == "tool":
         import json
 
-        return {"content": "", "tool_calls": [("play_move", {"move": json.loads(last["content"])["best_move"]})], "prompt_tokens": 10, "output_tokens": 2}
+        return {
+            "content": "",
+            "tool_calls": [("play_move", {"move": json.loads(last["content"])["best_move"]})],
+            "prompt_tokens": 10,
+            "output_tokens": 2,
+        }
     return {"content": "", "tool_calls": [("analyze_position", {})], "prompt_tokens": 10, "output_tokens": 2}
 
 
@@ -66,8 +71,17 @@ async def test_tools_hide_game_id_and_search_settings():
 async def test_every_condition_finishes_a_game(condition, chat):
     async with Client(mcp) as client:
         result, stats = await play_game(
-            client, game="tictactoe", condition=condition, model="fake", seed=1, opponent="random",
-            opponent_seconds=0.05, analysis_seconds=0.1, chat=chat or first_legal, mcp_tools=await tools_for(client), rules="",
+            client,
+            game="tictactoe",
+            condition=condition,
+            model="fake",
+            seed=1,
+            opponent="random",
+            opponent_seconds=0.05,
+            analysis_seconds=0.1,
+            chat=chat or first_legal,
+            mcp_tools=await tools_for(client),
+            rules="",
         )
     assert result in ("win", "draw", "loss") and stats.turns >= 1
     assert stats.illegal_moves == stats.fallback_moves == 0
@@ -81,9 +95,29 @@ async def test_every_condition_finishes_a_game(condition, chat):
 async def test_counts_illegal_moves_and_falls_back_when_the_model_never_calls_a_tool():
     async with Client(mcp) as client:
         tools = await tools_for(client)
-        _, illegal = await play_game(client, game="tictactoe", condition="llm", model="fake", seed=0, opponent="random",
-                                     opponent_seconds=0.05, analysis_seconds=0.1, chat=illegal_then_legal, mcp_tools=tools)
-        _, silent = await play_game(client, game="tictactoe", condition="llm", model="fake", seed=0, opponent="random",
-                                    opponent_seconds=0.05, analysis_seconds=0.1, chat=chatty, mcp_tools=tools)
+        _, illegal = await play_game(
+            client,
+            game="tictactoe",
+            condition="llm",
+            model="fake",
+            seed=0,
+            opponent="random",
+            opponent_seconds=0.05,
+            analysis_seconds=0.1,
+            chat=illegal_then_legal,
+            mcp_tools=tools,
+        )
+        _, silent = await play_game(
+            client,
+            game="tictactoe",
+            condition="llm",
+            model="fake",
+            seed=0,
+            opponent="random",
+            opponent_seconds=0.05,
+            analysis_seconds=0.1,
+            chat=chatty,
+            mcp_tools=tools,
+        )
     assert illegal.illegal_moves == illegal.turns and illegal.fallback_moves == 0
     assert silent.fallback_moves == silent.turns and silent.replies_without_tool == 6 * silent.turns

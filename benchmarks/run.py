@@ -16,18 +16,31 @@ import sys
 import time
 from pathlib import Path
 
+from agent import CONDITIONS, play_game
 from mcp import Client, StdioServerParameters
 
-from agent import CONDITIONS, play_game
-
 COLUMNS = [
-    "game", "condition", "model", "opponent", "seed", "play_as", "result", "turns", "illegal_moves",
-    "replies_without_tool", "fallback_moves", "analyze_calls", "llm_calls", "prompt_tokens",
-    "output_tokens", "llm_seconds", "seconds",
+    "game",
+    "condition",
+    "model",
+    "opponent",
+    "seed",
+    "play_as",
+    "result",
+    "turns",
+    "illegal_moves",
+    "replies_without_tool",
+    "fallback_moves",
+    "analyze_calls",
+    "llm_calls",
+    "prompt_tokens",
+    "output_tokens",
+    "llm_seconds",
+    "seconds",
 ]
 # Opponent of each game: the strongest fair pyplAI algorithm, with a short thinking time
 OPPONENTS = {"tictactoe": "mcts", "ultimate": "mcts", "phantom": "mo-ismcts"}
-DEFAULT_GAMES_PER_CONFIG = {"tictactoe": 30, "ultimate": 10, "phantom": 20}
+DEFAULT_GAMES_PER_CONFIG = {"tictactoe": 100, "ultimate": 40, "phantom": 100}
 
 
 def done_keys(path: Path) -> set[tuple[str, str, str, int]]:
@@ -69,23 +82,43 @@ async def main() -> None:
                                 continue
                             t0 = time.perf_counter()
                             result, stats = await play_game(
-                                client, game=game, condition=condition, model=model, seed=seed, opponent=OPPONENTS[game],
-                                opponent_seconds=args.opponent_seconds, analysis_seconds=args.analysis_seconds,
-                                mcp_tools=mcp_tools, rules=rules,
+                                client,
+                                game=game,
+                                condition=condition,
+                                model=model,
+                                seed=seed,
+                                opponent=OPPONENTS[game],
+                                opponent_seconds=args.opponent_seconds,
+                                analysis_seconds=args.analysis_seconds,
+                                mcp_tools=mcp_tools,
+                                rules=rules,
                             )
                             row = {
-                                "game": game, "condition": condition, "model": model, "opponent": OPPONENTS[game],
-                                "seed": seed, "play_as": 1 + seed % 2, "result": result, "turns": stats.turns,
-                                "illegal_moves": stats.illegal_moves, "replies_without_tool": stats.replies_without_tool,
-                                "fallback_moves": stats.fallback_moves, "analyze_calls": stats.analyze_calls,
-                                "llm_calls": stats.llm_calls, "prompt_tokens": stats.prompt_tokens,
-                                "output_tokens": stats.output_tokens, "llm_seconds": round(stats.llm_seconds, 1),
+                                "game": game,
+                                "condition": condition,
+                                "model": model,
+                                "opponent": OPPONENTS[game],
+                                "seed": seed,
+                                "play_as": 1 + seed % 2,
+                                "result": result,
+                                "turns": stats.turns,
+                                "illegal_moves": stats.illegal_moves,
+                                "replies_without_tool": stats.replies_without_tool,
+                                "fallback_moves": stats.fallback_moves,
+                                "analyze_calls": stats.analyze_calls,
+                                "llm_calls": stats.llm_calls,
+                                "prompt_tokens": stats.prompt_tokens,
+                                "output_tokens": stats.output_tokens,
+                                "llm_seconds": round(stats.llm_seconds, 1),
                                 "seconds": round(time.perf_counter() - t0, 1),
                             }
                             writer.writerow(row)
                             f.flush()
-                            print(f"{game} {condition} {model} seed={seed}: {result} ({row['seconds']} s, "
-                                  f"{stats.illegal_moves} illegal, {stats.fallback_moves} fallback)", flush=True)
+                            print(
+                                f"{game} {condition} {model} seed={seed}: {result} ({row['seconds']} s, "
+                                f"{stats.illegal_moves} illegal, {stats.fallback_moves} fallback)",
+                                flush=True,
+                            )
 
 
 if __name__ == "__main__":
