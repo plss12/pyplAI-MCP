@@ -103,6 +103,15 @@ position before you move."*
   against their schema (for example, analysis time between 0.1 and 10 seconds).
 - **Bounded memory.** At most 100 games are kept, and idle games expire after an hour.
 
+## Benchmark
+
+Does a small model play better with these tools? [`benchmarks/`](benchmarks/) lets Llama 3.2 3B,
+served locally with Ollama, play 960 games through the server, with and without
+`analyze_position`. In tic-tac-toe the tool cut its losses against MCTS from 100% to 31%, and in the
+34 games where it followed every recommendation it never lost. In Ultimate tic-tac-toe it gained
+little (8% wins, against 90% for the search alone), because it ignored the analysis most often
+there. The search helps a small model about as much as the model trusts it.
+
 ## Development
 
 ```bash
@@ -121,9 +130,6 @@ npx @modelcontextprotocol/inspector uv run pyplai-mcp
 ## Roadmap
 
 - Publish on PyPI, so it installs with `uvx pyplai-mcp`, and list it in the official MCP Registry.
-
-- Benchmark small open models served locally with Ollama, with and without the search tools, to
-  measure how much search improves their play.
 - More pyplAI games: draughts, Escoba and Stratego.
 
 ## References

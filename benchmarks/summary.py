@@ -1,7 +1,8 @@
 """Summarise results.csv: win, draw and loss rates per game, condition and model, with 95% Wilson intervals.
 
 For the LLM with search, "Analysed" is the share of its moves played after calling analyze_position, and
-"Follows" the share of those that were the move the search ranked best.
+"Follows" the share of those that were the move the search ranked best. A second table splits its games
+by whether it played every move the search ranked best.
 
 uv run python benchmarks/summary.py [results.csv]
 """
@@ -53,6 +54,16 @@ def main() -> None:
             f"{100 * draws / n:.0f}% | {100 * losses / n:.0f}% [{100 * loss_low:.0f}-{100 * loss_high:.0f}] | "
             f"{analysis} | {illegal:.2f} | {fallback:.2f} | {seconds:.0f} |"
         )
+
+    print("\n| Game | LLM with search | Games | Wins | Draws | Losses |")
+    print("| --- | --- | --- | --- | --- | --- |")
+    for (game, condition, _), rows in groups.items():
+        if condition != "llm+search":
+            continue
+        always = [r for r in rows if r["followed_analysis"] == r["turns"]]
+        for label, subset in (("followed every move", always), ("deviated at least once", [r for r in rows if r not in always])):
+            counts = [sum(r["result"] == result for r in subset) for result in ("win", "draw", "loss")]
+            print(f"| {game} | {label} | {len(subset)} | {counts[0]} | {counts[1]} | {counts[2]} |")
 
 
 if __name__ == "__main__":
