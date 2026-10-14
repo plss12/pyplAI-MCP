@@ -1,0 +1,65 @@
+[project]
+name = "pyplai-mcp"
+version = "0.1.0"
+description = "MCP server that lets language models play board games with pyplAI's search algorithms as tools"
+readme = "README.md"
+authors = [{ name = "Pedro Luis Soto Santos", email = "pepoluis712@gmail.com" }]
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["mcp", "model context protocol", "llm", "agents", "mcts", "minimax", "ismcts", "board games"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Games/Entertainment :: Board Games",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "mcp>=2.3,<3",
+    "pyplai>=1.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/plss12/pyplAI-MCP"
+pyplAI = "https://github.com/plss12/pyplAI"
+
+[project.scripts]
+pyplai-mcp = "pyplai_mcp:main"
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+pyplai = { path = "../pyplAI" }
+
+[dependency-groups]
+dev = [
+    "anyio>=4.15.1",
+    "pyright>=1.1.414",
+    "pytest>=9.1.1",
+    "ruff>=0.17.0",
+]
+
+[tool.ruff]
+line-length = 140
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.pyright]
+include = ["src"]
+typeCheckingMode = "strict"
+pythonVersion = "3.11"
+reportMissingTypeStubs = false
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
