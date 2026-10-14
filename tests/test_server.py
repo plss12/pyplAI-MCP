@@ -32,13 +32,15 @@ async def call_error(client, tool, **args):
 @pytest.mark.anyio
 async def test_lists_tools_resources_and_prompts(client):
     tools = {t.name for t in (await client.list_tools()).tools}
-    assert tools == {"list_games", "new_game", "get_state", "play_move", "analyze_position", "end_game"}
+    assert tools == {"list_games", "get_rules", "new_game", "get_state", "play_move", "analyze_position", "end_game"}
     games = (await call(client, "list_games"))["result"]
     assert [g["name"] for g in games] == ["tictactoe", "ultimate", "phantom"]
     phantom = games[2]
     assert "mcts" not in phantom["opponents"] and "mo-ismcts" in phantom["analysis_algorithms"]
     rules = await client.read_resource("rules://ultimate")
     assert "closed board" in rules.contents[0].text
+    # Clients that cannot read resources get the same text from a tool
+    assert (await call(client, "get_rules", game="ultimate"))["result"] == rules.contents[0].text
     prompt = await client.get_prompt("play_game", {"game": "phantom"})
     assert "analyze_position" in prompt.messages[0].content.text
 
@@ -130,6 +132,23 @@ async def test_phantom_never_reveals_hidden_stones(client):
         pytest.fail("the game did not end")
     if state["status"] != "your_turn":
         assert any("full board" in note for note in state["notes"])
+
+
+@pytest.mark.anyio
+async def test_phantom_bump_into_the_last_cell_is_reported_as_a_bump(client):
+    """The end of a real game: player 1's last unknown cell, d3, holds a hidden stone and fills the board."""
+    from pyplai_mcp.server import store
+
+    state = await call(client, "new_game", game="phantom", opponent="random")
+    game = store.get(state["game_id"]).game
+    final = "2221112211221112"  # rows 1 to 4, a to d
+    game.board = [int(cell) for cell in final]
+    game.stones = {1: 8, 2: 8}
+    d3 = 11
+    game.discovered = {1: {i for i, v in enumerate(game.board) if v == 2 and i != d3}, 2: set()}
+    result = await call(client, "play_move", game_id=state["game_id"], move="d3")
+    assert result["outcome"].startswith("You tried d3: it holds a hidden opponent stone.")
+    assert "No moves are left." in result["outcome"] and result["state"]["status"] == "draw"
 
 
 @pytest.mark.anyio

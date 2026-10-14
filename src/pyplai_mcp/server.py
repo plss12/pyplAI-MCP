@@ -23,7 +23,7 @@ INSTRUCTIONS = """\
 Play board games against search algorithms from the pyplAI library, and use those same
 algorithms to analyse your own positions.
 
-1. list_games shows the games. Read rules://<game> for the full rules.
+1. list_games shows the games, and get_rules (or the rules://<game> resource) their full rules.
 2. new_game starts a game against an opponent. Whenever you get a state back it is your turn,
    unless the game is over: the opponent replies inside play_move.
 3. analyze_position runs a search (Monte Carlo tree search, minimax or information set MCTS)
@@ -87,8 +87,10 @@ def _state(session: Session) -> GameState:
 
 
 def _describe_own_move(game: Game, move_text: str, before_player: int) -> str:
-    if isinstance(game, Phantom) and game.jugadorActual == before_player and game.winner() is None:
-        return f"You tried {move_text}: it holds a hidden opponent stone. You discovered it and must move again."
+    if isinstance(game, Phantom) and game.jugadorActual == before_player and game.bumped:
+        # Bumping into the last cell you knew nothing about fills the board and ends the game
+        then = "You must move again." if game.winner() is None else "No moves are left."
+        return f"You tried {move_text}: it holds a hidden opponent stone. You discovered it. {then}"
     return f"You played {move_text}."
 
 
@@ -134,6 +136,12 @@ def list_games() -> list[GameInfo]:
         )
         for game in GAMES.values()
     ]
+
+
+@mcp.tool(annotations=READ_ONLY)
+def get_rules(game: Annotated[GameName, Field(description="Game name from list_games.")]) -> str:
+    """Full rules and move notation of a game, in Markdown. The same text as the rules://{game} resource."""
+    return GAMES[game].rules
 
 
 @mcp.tool()
@@ -276,7 +284,7 @@ def rules(game: str) -> str:
 def play_game(game: str = "ultimate", opponent: str = "auto") -> str:
     """Play a full game, using the search tools to choose and explain each move."""
     return (
-        f"Let's play {game} against the {opponent} opponent of the pyplai server. Read rules://{game} first, "
+        f"Let's play {game} against the {opponent} opponent of the pyplai server. Read its rules with get_rules first, "
         f"then start with new_game. Before each of your moves, call analyze_position, pick a move and explain "
         f"in one or two sentences why, quoting the numbers from the analysis. Then call play_move and tell me "
         f"what the opponent did. Keep going until the game ends."

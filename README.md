@@ -47,15 +47,17 @@ checking that nothing the player receives reveals a hidden stone.
 | Tool | What it does |
 | --- | --- |
 | `list_games` | Games, move notation, opponents and analysis algorithms. |
+| `get_rules` | The full rules of a game. |
 | `new_game` | Starts a game. Options: who moves first, the opponent, its thinking time or depth, a seed and opening moves to set up a position. |
 | `get_state` | The board as you see it, your legal moves and the history. |
 | `play_move` | Plays your move; the opponent replies in the same call. Illegal moves return an error listing the legal ones. |
 | `analyze_position` | Ranks your legal moves with MCTS, minimax or information set MCTS. |
 | `end_game` | Frees a game. |
 
-It also exposes the rules of each game as the `rules://{game}` resource and a `play_game` prompt
-that asks the model to analyse, explain and play a whole game. Every tool returns structured
-output with a published schema.
+The rules are also the `rules://{game}` resource, but `get_rules` exists because a model often
+cannot read resources on its own: in Claude Desktop it only calls tools. A `play_game` prompt asks
+the model to analyse, explain and play a whole game, and every tool returns structured output with
+a published schema.
 
 ## Use it
 
