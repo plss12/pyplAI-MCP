@@ -31,6 +31,9 @@ class Stats:
     replies_without_tool: int = 0
     fallback_moves: int = 0
     analyze_calls: int = 0
+    # Turns the model played a move of its own after analysing, and how many of those were the search's best move
+    analysed_moves: int = 0
+    followed_analysis: int = 0
     llm_calls: int = 0
     prompt_tokens: int = 0
     output_tokens: int = 0
@@ -124,6 +127,7 @@ async def play_llm_turn(
         {"role": "system", "content": system_prompt(rules, condition)},
         {"role": "user", "content": describe(state)},
     ]
+    best_move = None
     for _ in range(MAX_STEPS_PER_TURN):
         t0 = time.perf_counter()
         reply = chat(model, messages, tools)
@@ -143,10 +147,15 @@ async def play_llm_turn(
             if name == "analyze_position" and condition == "llm+search":
                 stats.analyze_calls += 1
                 ok, analysis = await call(client, "analyze_position", game_id=game_id, seconds=analysis_seconds, top_k=5)
+                if ok:
+                    best_move = analysis["best_move"]
                 messages.append({"role": "tool", "tool_name": name, "content": json.dumps(analysis) if ok else str(analysis)})
             elif name == "play_move":
                 ok, result = await call(client, "play_move", game_id=game_id, move=str(arguments.get("move", "")))
                 if ok:
+                    if best_move is not None:
+                        stats.analysed_moves += 1
+                        stats.followed_analysis += result["your_move"] == best_move
                     return result["state"]
                 stats.illegal_moves += 1
                 messages.append({"role": "tool", "tool_name": name, "content": str(result)})

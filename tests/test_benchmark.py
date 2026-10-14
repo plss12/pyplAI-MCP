@@ -86,7 +86,7 @@ async def test_every_condition_finishes_a_game(condition, chat):
     assert result in ("win", "draw", "loss") and stats.turns >= 1
     assert stats.illegal_moves == stats.fallback_moves == 0
     if condition == "llm+search":
-        assert stats.analyze_calls == stats.turns
+        assert stats.analyze_calls == stats.analysed_moves == stats.followed_analysis == stats.turns
     if condition in ("search", "random"):
         assert stats.llm_calls == 0
 
