@@ -1,8 +1,10 @@
 import random
+from copy import deepcopy
 
 import pytest
 
 from pyplai_mcp.games import GAMES, Phantom, TicTacToe, UltimateTicTacToe
+from pyplai_mcp.games.base import find_lines
 from pyplai_mcp.games.ultimate import DRAWN
 
 
@@ -63,6 +65,23 @@ def test_ultimate_full_board_without_winner_frees_the_next_player():
     boards = {game.move_id(m).split(":")[0] for m in game.legal_moves()}
     assert len(boards) == 8 and "A1" not in boards
     assert game.winner() is None
+
+
+def test_ultimate_stored_winner_matches_the_big_board():
+    # apply keeps the winner instead of scanning the big board on every call: it must always
+    # agree with a full scan, including after search copies of the state
+    rng = random.Random(1)
+    lines = find_lines(3, 3)
+    for _ in range(200):
+        game = UltimateTicTacToe()
+        while True:
+            state = deepcopy(game) if rng.random() < 0.5 else game
+            for player in (1, 2):
+                scanned = any(all(state.main[i] == player for i in line) for line in lines)
+                assert state.is_winner(player) == scanned
+            if game.winner() is not None:
+                break
+            game.apply(rng.choice(game.legal_moves()))
 
 
 def test_phantom_bump_discovers_the_stone_and_keeps_the_turn():
