@@ -43,9 +43,14 @@ For example, `B2:a1` is the top-left cell of the centre board.
         self.main = [0] * 9
         # Board the player to move is sent to, or None to play anywhere
         self.target: int | None = None
+        # Winner of the game (1 or 2), or 0. The search asks for it several times per simulated
+        # move and scanning the big board each time was most of the search time, but it can only
+        # change when apply closes a small board, so apply keeps it up to date. Anything that
+        # writes to main without apply must update it too.
+        self.won = 0
 
     def legal_moves(self) -> list[Move]:
-        if self.is_winner(1) or self.is_winner(2):
+        if self.won:
             return []
         boards = [self.target] if self.target is not None and self.main[self.target] == 0 else range(9)
         return [b * 9 + c for b in boards if self.main[b] == 0 for c in range(9) if self.cells[b][c] == 0]
@@ -56,6 +61,8 @@ For example, `B2:a1` is the top-left cell of the centre board.
         self.cells[board][cell] = player
         if any(all(self.cells[board][i] == player for i in line) for line in LINES):
             self.main[board] = player
+            if any(all(self.main[i] == player for i in line) for line in LINES):
+                self.won = player
         elif all(self.cells[board]):
             self.main[board] = DRAWN
         self.target = cell
@@ -63,7 +70,7 @@ For example, `B2:a1` is the top-left cell of the centre board.
         return self
 
     def is_winner(self, player: int) -> bool:
-        return any(all(self.main[i] == player for i in line) for line in LINES)
+        return self.won == player
 
     def heuristic(self, player: int) -> float:
         rival = 3 - player

@@ -116,7 +116,7 @@ Does a small model play better with these tools? [`benchmarks/`](benchmarks/) le
 served locally with Ollama, play 960 games through the server, with and without
 `analyze_position`. In tic-tac-toe the tool cut its losses against MCTS from 100% to 31%, and in the
 34 games where it followed every recommendation it never lost. In Ultimate tic-tac-toe it gained
-little (8% wins, against 90% for the search alone), because it ignored the analysis most often
+nothing (no wins, against 82% for the search alone), because it ignored the analysis most often
 there. The search helps a small model about as much as the model trusts it.
 
 ## Development
