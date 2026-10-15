@@ -40,7 +40,9 @@ move, tokens and seconds. `summary.py` turns it into the table below, with 95% W
 
 ## Results
 
-960 games, run on 14 October 2026. `summary.py` prints these tables from `results.csv`.
+960 games: tic-tac-toe and Phantom run on 14 October 2026, and Ultimate tic-tac-toe on 15 October,
+after a change that made its rules about three times as fast to search (see below). `summary.py`
+prints these tables from `results.csv`.
 
 | Game | Player | Model | Games | Wins [95% CI] | Draws | Losses [95% CI] | Analysed | Follows | Illegal moves / game | Fallback moves / game | Median seconds / game |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -48,10 +50,10 @@ move, tokens and seconds. `summary.py` turns it into the table below, with 95% W
 | tictactoe | llm+search | llama3.2:3b | 100 | 3% [1-8] | 66% | 31% [23-41] | 100% | 80% | 0.00 | 0.00 | 9 |
 | tictactoe | search | - | 100 | 0% [0-4] | 100% | 0% [0-4] | - | - | 0.00 | 0.00 | 5 |
 | tictactoe | random | - | 100 | 0% [0-4] | 8% | 92% [85-96] | - | - | 0.00 | 0.00 | 1 |
-| ultimate | llm | llama3.2:3b | 40 | 0% [0-9] | 0% | 100% [91-100] | - | - | 0.12 | 0.00 | 12 |
-| ultimate | llm+search | llama3.2:3b | 40 | 8% [3-20] | 2% | 90% [77-96] | 55% | 61% | 0.05 | 0.50 | 48 |
-| ultimate | search | - | 40 | 90% [77-96] | 5% | 5% [1-17] | - | - | 0.00 | 0.00 | 29 |
-| ultimate | random | - | 40 | 0% [0-9] | 0% | 100% [91-100] | - | - | 0.00 | 0.00 | 5 |
+| ultimate | llm | llama3.2:3b | 40 | 0% [0-9] | 0% | 100% [91-100] | - | - | 0.10 | 0.00 | 10 |
+| ultimate | llm+search | llama3.2:3b | 40 | 0% [0-9] | 8% | 92% [80-97] | 67% | 60% | 0.00 | 0.50 | 46 |
+| ultimate | search | - | 40 | 82% [68-91] | 8% | 10% [4-23] | - | - | 0.00 | 0.00 | 28 |
+| ultimate | random | - | 40 | 0% [0-9] | 0% | 100% [91-100] | - | - | 0.00 | 0.00 | 4 |
 | phantom | llm | llama3.2:3b | 100 | 57% [47-66] | 1% | 42% [33-52] | - | - | 0.00 | 0.00 | 2 |
 | phantom | llm+search | llama3.2:3b | 100 | 45% [36-55] | 28% | 27% [19-36] | 100% | 91% | 0.00 | 0.00 | 12 |
 | phantom | search | - | 100 | 48% [38-58] | 32% | 20% [13-29] | - | - | 0.00 | 0.00 | 6 |
@@ -62,7 +64,7 @@ move, tokens and seconds. `summary.py` turns it into the table below, with 95% W
 | tictactoe | followed every move | 34 | 0 | 34 | 0 |
 | tictactoe | deviated at least once | 66 | 3 | 32 | 31 |
 | ultimate | followed every move | 0 | 0 | 0 | 0 |
-| ultimate | deviated at least once | 40 | 3 | 1 | 36 |
+| ultimate | deviated at least once | 40 | 0 | 3 | 37 |
 | phantom | followed every move | 56 | 28 | 5 | 23 |
 | phantom | deviated at least once | 44 | 17 | 23 | 4 |
 
@@ -75,10 +77,10 @@ What the numbers say:
   but played the recommended move 80% of the time. In the 34 games where it followed every
   recommendation it drew all 34, as the search does on its own; all 31 losses came from games where
   it overrode the search at least once.
-- **In Ultimate the tool barely helped: 8% wins, against 90% for the search alone.** The model
-  analysed before only 55% of its moves, followed the analysis 61% of the time when it did, and
-  never followed it for a whole game. Half a move per game was a fallback, after six attempts without
-  a legal move.
+- **In Ultimate the tool did not help: no wins and 92% losses, against 82% wins for the search
+  alone.** The model analysed before 67% of its moves, followed the analysis 60% of the time when it
+  did, and never followed it for a whole game. Half a move per game was a fallback, after six
+  attempts without a legal move.
 - **Phantom behaves differently.** The model alone already won 57%, close to the search's 48%,
   though it lost twice as often (42% against 20%). With the tool it followed 91% of the
   recommendations and ended close to the search: 45% wins and 27% losses. The split by
@@ -87,7 +89,22 @@ What the numbers say:
 
 The search tool helps a small model about as much as the model trusts it. In tic-tac-toe and
 Phantom, where Llama 3.2 3B followed most recommendations, it came close to the search; in
-Ultimate, the hardest of the three, it ignored them most often and gained least.
+Ultimate, the hardest of the three, it ignored them most often and gained nothing.
+
+### The Ultimate tic-tac-toe rerun
+
+The first run of Ultimate (14 October) used rules that rescanned the big board for a winner
+several times per simulated move. They now keep the winner in the state: the game behaves exactly
+as before, but a search of 1 second runs 2.5 to 3.2 times as many iterations, for the opponent
+and for `analyze_position` alike. The rerun changed no conclusion, and every difference falls
+inside the 95% intervals of both runs:
+
+| Ultimate | 14 October (wins / draws / losses) | 15 October |
+| --- | --- | --- |
+| llm | 0 / 0 / 100% | 0 / 0 / 100% |
+| llm+search | 8 / 2 / 90% | 0 / 8 / 92% |
+| search | 90 / 5 / 5% | 82 / 8 / 10% |
+| random | 0 / 0 / 100% | 0 / 0 / 100% |
 
 ## Run it
 
