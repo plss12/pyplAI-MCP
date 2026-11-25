@@ -20,7 +20,7 @@ classifiers = [
 ]
 dependencies = [
     "mcp>=2.3,<3",
-    "pyplai @ git+https://github.com/plss12/pyplAI@v1.1.0",
+    "pyplai>=1.1.0,<2",
 ]
 
 [project.urls]

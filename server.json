@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.plss12/pyplai-mcp",
+  "title": "pyplAI",
+  "description": "Play board games against MCTS, minimax and ISMCTS, and use the same searches as tools.",
+  "repository": {
+    "url": "https://github.com/plss12/pyplAI-MCP",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "pyplai-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

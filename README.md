@@ -1,5 +1,7 @@
 # pyplAI-MCP
 
+<!-- mcp-name: io.github.plss12/pyplai-mcp -->
+
 An [MCP](https://modelcontextprotocol.io) server that lets a language model play board games
 against search algorithms, and use those same algorithms as tools to choose its own moves.
 
@@ -62,12 +64,13 @@ a published schema.
 ## Use it
 
 Requires [uv](https://docs.astral.sh/uv/). The server speaks MCP over stdio, and `uvx` installs and
-runs it straight from this repository (it is not on PyPI yet).
+runs it from [PyPI](https://pypi.org/project/pyplai-mcp/). It is also listed in the
+[MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.plss12/pyplai-mcp`.
 
 **Claude Code**
 
 ```bash
-claude mcp add pyplai -- uvx --from git+https://github.com/plss12/pyplAI-MCP pyplai-mcp
+claude mcp add pyplai -- uvx pyplai-mcp
 ```
 
 **Claude Desktop** (`claude_desktop_config.json`)
@@ -77,22 +80,22 @@ claude mcp add pyplai -- uvx --from git+https://github.com/plss12/pyplAI-MCP pyp
   "mcpServers": {
     "pyplai": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/plss12/pyplAI-MCP", "pyplai-mcp"]
+      "args": ["pyplai-mcp"]
     }
   }
 }
 ```
 
-**Any other client:** run `uvx --from git+https://github.com/plss12/pyplAI-MCP pyplai-mcp` over stdio, or add
+**Any other client:** run `uvx pyplai-mcp` over stdio, or add
 `--transport streamable-http --port 8000` and connect to `http://127.0.0.1:8000/mcp`.
 
 Then ask for a game, for example: *"Play Phantom against the MO-ISMCTS opponent, and analyse each
 position before you move."*
 
-[Here is a real game](examples/phantom-claude-desktop.md) that Claude played and won from Claude
+[Here is a real game](https://github.com/plss12/pyplAI-MCP/blob/main/examples/phantom-claude-desktop.md) that Claude played and won from Claude
 Desktop, analysing every position before moving:
 
-![Claude Desktop calling play_move and analyze_position in a game of Phantom](examples/phantom-claude-desktop.png)
+![Claude Desktop calling play_move and analyze_position in a game of Phantom](https://raw.githubusercontent.com/plss12/pyplAI-MCP/main/examples/phantom-claude-desktop.png)
 
 ## Design notes
 
@@ -112,7 +115,7 @@ Desktop, analysing every position before moving:
 
 ## Benchmark
 
-Does a small model play better with these tools? [`benchmarks/`](benchmarks/) lets Llama 3.2 3B,
+Does a small model play better with these tools? [`benchmarks/`](https://github.com/plss12/pyplAI-MCP/tree/main/benchmarks) lets Llama 3.2 3B,
 served locally with Ollama, play 960 games through the server, with and without
 `analyze_position`. In tic-tac-toe the tool cut its losses against MCTS from 100% to 31%, and in the
 34 games where it followed every recommendation it never lost. In Ultimate tic-tac-toe it gained
@@ -136,7 +139,6 @@ npx @modelcontextprotocol/inspector uv run pyplai-mcp
 
 ## Roadmap
 
-- Publish on PyPI, so it installs with `uvx pyplai-mcp`, and list it in the official MCP Registry.
 - More pyplAI games: draughts, Escoba and Stratego.
 
 ## References
