@@ -1,5 +1,7 @@
 # pyplAI-MCP
 
+<!-- mcp-name: io.github.plss12/pyplai-mcp -->
+
 An [MCP](https://modelcontextprotocol.io) server that lets a language model play board games
 against search algorithms, and use those same algorithms as tools to choose its own moves.
 
@@ -62,12 +64,13 @@ a published schema.
 ## Use it
 
 Requires [uv](https://docs.astral.sh/uv/). The server speaks MCP over stdio, and `uvx` installs and
-runs it straight from this repository (it is not on PyPI yet).
+runs it from [PyPI](https://pypi.org/project/pyplai-mcp/). It is also listed in the
+[MCP Registry](https://registry.modelcontextprotocol.io) as `io.github.plss12/pyplai-mcp`.
 
 **Claude Code**
 
 ```bash
-claude mcp add pyplai -- uvx --from git+https://github.com/plss12/pyplAI-MCP pyplai-mcp
+claude mcp add pyplai -- uvx pyplai-mcp
 ```
 
 **Claude Desktop** (`claude_desktop_config.json`)
@@ -77,13 +80,13 @@ claude mcp add pyplai -- uvx --from git+https://github.com/plss12/pyplAI-MCP pyp
   "mcpServers": {
     "pyplai": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/plss12/pyplAI-MCP", "pyplai-mcp"]
+      "args": ["pyplai-mcp"]
     }
   }
 }
 ```
 
-**Any other client:** run `uvx --from git+https://github.com/plss12/pyplAI-MCP pyplai-mcp` over stdio, or add
+**Any other client:** run `uvx pyplai-mcp` over stdio, or add
 `--transport streamable-http --port 8000` and connect to `http://127.0.0.1:8000/mcp`.
 
 Then ask for a game, for example: *"Play Phantom against the MO-ISMCTS opponent, and analyse each
@@ -136,7 +139,6 @@ npx @modelcontextprotocol/inspector uv run pyplai-mcp
 
 ## Roadmap
 
-- Publish on PyPI, so it installs with `uvx pyplai-mcp`, and list it in the official MCP Registry.
 - More pyplAI games: draughts, Escoba and Stratego.
 
 ## References
