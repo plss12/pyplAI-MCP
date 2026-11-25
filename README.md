@@ -92,10 +92,10 @@ claude mcp add pyplai -- uvx pyplai-mcp
 Then ask for a game, for example: *"Play Phantom against the MO-ISMCTS opponent, and analyse each
 position before you move."*
 
-[Here is a real game](examples/phantom-claude-desktop.md) that Claude played and won from Claude
+[Here is a real game](https://github.com/plss12/pyplAI-MCP/blob/main/examples/phantom-claude-desktop.md) that Claude played and won from Claude
 Desktop, analysing every position before moving:
 
-![Claude Desktop calling play_move and analyze_position in a game of Phantom](examples/phantom-claude-desktop.png)
+![Claude Desktop calling play_move and analyze_position in a game of Phantom](https://raw.githubusercontent.com/plss12/pyplAI-MCP/main/examples/phantom-claude-desktop.png)
 
 ## Design notes
 
@@ -115,7 +115,7 @@ Desktop, analysing every position before moving:
 
 ## Benchmark
 
-Does a small model play better with these tools? [`benchmarks/`](benchmarks/) lets Llama 3.2 3B,
+Does a small model play better with these tools? [`benchmarks/`](https://github.com/plss12/pyplAI-MCP/tree/main/benchmarks) lets Llama 3.2 3B,
 served locally with Ollama, play 960 games through the server, with and without
 `analyze_position`. In tic-tac-toe the tool cut its losses against MCTS from 100% to 31%, and in the
 34 games where it followed every recommendation it never lost. In Ultimate tic-tac-toe it gained
