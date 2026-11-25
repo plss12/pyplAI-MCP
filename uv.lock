@@ -626,7 +626,11 @@ crypto = [
 [[package]]
 name = "pyplai"
 version = "1.1.0"
-source = { git = "https://github.com/plss12/pyplAI?rev=v1.1.0#c667a17916e338d01c1004e28c1e043ab4600c37" }
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e6/e5/30a4e3a8d8affd66dd1432189294f7895f502091484dce8840bd960056e2/pyplai-1.1.0.tar.gz", hash = "sha256:14eb4e132bac4e99df8958496724ade1b0f9ef9b4f62ed3f6b0045fa131a9d48", size = 28951, upload-time = "2026-11-25T07:50:36.465Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d0/4e/fcde54f646cb2b87cb7c0d8d00605f048f5efa71f8c895e65f1882b97746/pyplai-1.1.0-py3-none-any.whl", hash = "sha256:4a5feccd3c93dcf4de7a8d90d38caba74e681d363ca13737e0af66b7987dcad0", size = 15418, upload-time = "2026-11-25T07:50:35.429Z" },
+]
 
 [[package]]
 name = "pyplai-mcp"
@@ -651,7 +655,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "mcp", specifier = ">=2.3,<3" },
-    { name = "pyplai", git = "https://github.com/plss12/pyplAI?rev=v1.1.0" },
+    { name = "pyplai", specifier = ">=1.1.0,<2" },
 ]
 
 [package.metadata.requires-dev]
